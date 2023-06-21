@@ -6,7 +6,13 @@ on:
   #   tags:
   #     - "*"
   # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch: {}
+  workflow_dispatch: 
+    # NOTE: inputs only to build tags that don't have this github workflow already in it
+    inputs:
+      tag:
+        type: string
+        description: Which tag to build
+        required: false
 
 jobs:
   main:
@@ -15,6 +21,10 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
+
+      - name: Switch to tag
+        if: ${{ github.event.inputs.tag }}
+        run: git checkout ${{ github.event.inputs.tag }}
 
       - name: Run repro
         run: cd stm32 && make repro
